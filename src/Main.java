@@ -1,6 +1,6 @@
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.security.*;
+import java.io.*; // for File
+import java.security.*; // for md5
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
