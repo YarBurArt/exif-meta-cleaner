@@ -4,6 +4,7 @@ import java.security.*; // for md5
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import javax.imageio.ImageIO;
 
 public class Main {
@@ -17,7 +18,7 @@ public class Main {
         try {
             File dir = new File(folder_path);
             // walking through files in a folder
-            for (File file : dir.listFiles()) {
+            for (File file : Objects.requireNonNull(dir.listFiles())) {
                 if (file.isFile()) {
                     // split name by dot, list<String> type for get()
                     List<String> sliced_file_name = new ArrayList<>(
@@ -37,8 +38,8 @@ public class Main {
                         ImageIO.write(image, file_format, new File(
                                 folder_path + new_file_name + "." + file_format)
                         );
-                        if (new_file_name.equals(name_hash))
-                            file.delete(); // delete old file
+                        if (new_file_name.equals(name_hash)) // delete old file
+                            if (file.delete()) System.out.printf("Old file %s is delete \n", file.getName());
 
                         System.out.printf("File %s is clean ... \n", file.getName());
                     }
@@ -55,10 +56,10 @@ public class Main {
             // md5 calculation as a byte array
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             // convert to normal string
             for (byte b : array) {
-                sb.append(Integer.toHexString((b & 0xFF) | 0x100).substring(1, 3));
+                sb.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
