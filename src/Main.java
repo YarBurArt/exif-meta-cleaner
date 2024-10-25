@@ -51,6 +51,8 @@ public class Main {
     public static void processImage(
         File file, List<String> files_formats, String folder_path
     ) throws IOException {
+        if (!isValidImageFile(file))
+            return; // if exploit is too simple, it's not interesting
         if (file.isFile()) {
             // split name by dot, list<String> type for get()
             List<String> sliced_file_name = new ArrayList<>(
@@ -77,6 +79,33 @@ public class Main {
             }
         }
     }
+    private static boolean isValidImageFile(File file) {
+        try (InputStream is = new FileInputStream(file)) {
+            byte[] header = new byte[8];
+            int read = is.read(header);
+            if (read != 8) return false; // too small
+            return isValidImageHeader(header); // else check headers
+        } catch (IOException e) {
+            return false; // no access to file
+        }
+    }
+    private static boolean isValidImageHeader(byte[] header) {
+        // check for PNG header
+        if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50
+            && header[2] == (byte) 0x4E && header[3] == (byte) 0x47) return true;
+
+        // check for JPEG/JFIF header
+        if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8) {
+            // double check for JFIF
+            if (header.length >= 10 && header[2] == (byte) 0xFF && header[3] == (byte) 0xE0 &&
+                header[6] == (byte) 0x4A && header[7] == (byte) 0x46
+                && header[8] == (byte) 0x49 && header[9] == (byte) 0x46) return true;
+            // then JPEG
+            return true;
+        }
+        return false;
+    }
+
     public static String MD5(String md5) {
         try {
             // md5 calculation as a byte array
