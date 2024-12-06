@@ -20,36 +20,64 @@ public class GUIMetaCleaner extends JFrame implements ActionListener {
     private JTextArea textarea;
     private JTextArea infoArea;
     private JTextField defaultText; 
+    private JButton translateButton;
 
-    public GUIMetaCleaner() {
+    private boolean isEnglish = false;
+
+     public GUIMetaCleaner() {
         super("Выбор папки");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new FlowLayout());
+        setLayout(new BorderLayout());
 
+        Color backgroundColor = new Color(0x8BCAA3);
+        Color textColor = new Color(0x333333);
+        Color buttonColor = new Color(0x016D7E);
+        Color buttonTextColor = new Color(0xD4CED3);
+
+        JPanel topPanel = new JPanel(new FlowLayout());
         button = new JButton("Выбрать папку");
+        button.setBackground(buttonColor);
+        button.setForeground(buttonTextColor);
         button.addActionListener(this);
-        add(button);
+        topPanel.add(button);
 
         st_button = new JButton("Стереть всю мету");
+        st_button.setBackground(buttonColor);
+        st_button.setForeground(buttonTextColor);
         st_button.addActionListener(this);
-        
+        topPanel.add(st_button);
+
+        translateButton = new JButton("switch language");
+        translateButton.setBackground(buttonColor);
+        translateButton.setForeground(buttonTextColor);
+        translateButton.addActionListener(this);
+        topPanel.add(translateButton);
+
+        add(topPanel, BorderLayout.NORTH);
+
         defaultText = new JTextField("Выберите папку...", 20);
-        add(defaultText);        
-        
-        textarea = new JTextArea("В выбранной папке у всех изображений будут\n отчищенны метаданные, нажмите старт чтобы начать\n (никакой загрузки пока нет, просто немного зависнет окно)");
+        defaultText.setBackground(backgroundColor);
+        defaultText.setForeground(textColor);
+        add(defaultText, BorderLayout.CENTER);
+
+        textarea = new JTextArea("В выбранной папке у всех изображений будут\n отчищенны метаданные, нажмите старт чтобы начать");
+        textarea.setBackground(backgroundColor);
+        textarea.setForeground(textColor);
         textarea.setEditable(false);
-        add(textarea);
-        add(st_button);
-        
+        add(textarea, BorderLayout.SOUTH);
+
         JTextArea infoArea = new JTextArea("---------------- Здесь лог выполнения -------------");
-        infoArea.setEditable(false); // Make it non-editable
+        infoArea.setBackground(backgroundColor);
+        infoArea.setForeground(textColor);
+        infoArea.setRows(3);
+        infoArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(infoArea);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scrollPane, BorderLayout.SOUTH); // Add to the bottom
+        add(scrollPane, BorderLayout.EAST);
 
         pack();
         setVisible(true);
-        setSize(400, 200);
+        setSize(600, 300);
     }
 
     @Override
@@ -67,7 +95,28 @@ public class GUIMetaCleaner extends JFrame implements ActionListener {
             }
         } else if (e.getSource() == st_button) {
             clean_folder(defaultText.getText());
+        }else if (e.getSource() == translateButton) {
+            translateText();
         }
+    }
+
+    private void translateText() {
+        if (!isEnglish) {
+            button.setText("Select Folder");
+            st_button.setText("Clear Metadata");
+            defaultText.setText("Select a folder...");
+            textarea.setText("All images in the selected folder will have\n their metadata cleared, click start to begin");
+            infoArea.setText("---------------- Execution Log -------------");
+            translateButton.setText("switch language");
+        } else {
+            button.setText("Выбрать папку");
+            st_button.setText("Стереть всю мету");
+            defaultText.setText("Выберите папку...");
+            textarea.setText("В выбранной папке у всех изображений будут\n отчищенны метаданные, нажмите старт чтобы начать");
+            infoArea.setText("---------------- Здесь лог выполнения -------------");
+            translateButton.setText("switch language");
+        }
+        isEnglish = !isEnglish; 
     }
 
     public static void main(String[] args) {
