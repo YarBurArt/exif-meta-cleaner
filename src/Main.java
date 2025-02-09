@@ -10,14 +10,35 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
+import static java.lang.System.exit;
+
 public class Main {
 
     public static void main(String[] args) {
-        String folder_path = "images/"; // from project root
+        // default variables args.length == 0
+        final String defaultFolderPath = "images/"; // from project root
+        // like array reference final because executorService and threads
+        final String[] folder_path = {defaultFolderPath};
+        if (args.length > 0) {
+            switch (args[0]) { // crutchy but pure java
+                case "--help":
+                    printHelp();
+                    return;
+                case "--path":
+                    assert(args.length > 1); // DEBUG
+                    folder_path[0] = args[1] + "/";
+                    System.out.println("Set path to " + folder_path[0]);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + args[0]
+                            + "\nWho're you trying to crack? We're in jvm.");
+            }
+        }
+
         List<String> files_formats = new ArrayList<>(
                 Arrays.asList("png", "jpg", "jpeg", "jfif"));
 
-        File dir = new File(folder_path);
+        File dir = new File(folder_path[0]);
         File[] files = Objects.requireNonNull(dir.listFiles());
 
         int numThreads = Runtime.getRuntime().availableProcessors(); // get available cores
@@ -30,7 +51,7 @@ public class Main {
                 executorService.submit(() -> {
                     // for catch errors from ImageIO
                     try {
-                        processImage(file, files_formats, folder_path);
+                        processImage(file, files_formats, folder_path[0]);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -46,6 +67,16 @@ public class Main {
         catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+    public static void printHelp() {
+        System.out.println(
+            """
+             Hi from the dir img metadata cleanup tool!
+            \t--help to print this message
+            \t--path ./to/images/ to set path start at working dir
+             Example: java ./Main.class --path images/\s
+             Check the decompiled from byte code if you don't trust me.
+            """);
     }
 
     public static void processImage(

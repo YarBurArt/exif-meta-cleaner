@@ -3,6 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="3775a2cb-d594-4f36-9449-700e87a8edc1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/03d6ef609b36c8e32feb3ffdbd2e56e1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/0676ebf20a9d315ffee9d27c36323a0e.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/839cd4d4491568c6f172317fd0476e0e.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/images/b450bd741a369a7f2c3d6389567f7b2a.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -44,7 +48,7 @@
       <recent name="H:\code\java\clean-exif-png\images" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.help">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="clean-exif-png" />
@@ -52,6 +56,27 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="help" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="clean-exif-png" />
+      <option name="PROGRAM_PARAMETERS" value="--help" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="path" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="clean-exif-png" />
+      <option name="PROGRAM_PARAMETERS" value="--path images/" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.help" />
+      <item itemvalue="Application.path" />
+      <item itemvalue="Application.Main" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
