@@ -8,37 +8,46 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.imageio.ImageIO;
 
-import static java.lang.System.exit;
 
 public class Main {
 
     public static void main(String[] args) {
         // default variables args.length == 0
         final String defaultFolderPath = "images/"; // from project root
-        // like array reference final because executorService and threads
-        final String[] folder_path = {defaultFolderPath};
+        // like AtomicReference final because executorService and threads, we might change it
+        final AtomicReference<String> folderPath = new AtomicReference<>(defaultFolderPath);
         if (args.length > 0) {
             switch (args[0]) { // crutchy but pure java
-                case "--help":
+                case "--help" -> {
                     printHelp();
                     return;
-                case "--path":
-                    assert(args.length > 1); // DEBUG
-                    folder_path[0] = args[1] + "/";
-                    System.out.println("Set path to " + folder_path[0]);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + args[0]
-                            + "\nWho're you trying to crack? We're in jvm.");
+                }
+                case "--path" -> {
+                    if (args.length < 2) {
+                        System.err.println("Why you don't write path after --path?");
+                        return;
+                    }
+                    // set and add slash if not exists
+                    folderPath.set(args[1].endsWith("/") ? args[1] : args[1] + "/");
+                    System.out.println("Set path to " + folderPath.get());
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + args[0]
+                        + "\nWho're you trying to crack? We're in jvm.");
             }
         }
 
         List<String> files_formats = new ArrayList<>(
                 Arrays.asList("png", "jpg", "jpeg", "jfif"));
 
-        File dir = new File(folder_path[0]);
+        File dir = new File(folderPath.get());
+        if (!dir.exists() || !dir.isDirectory()) {
+            System.err.println("Directory: " + folderPath + 
+                " not exists or it's a file (isn't like in linux)");
+            return;
+        }
         File[] files = Objects.requireNonNull(dir.listFiles());
 
         int numThreads = Runtime.getRuntime().availableProcessors(); // get available cores
@@ -51,7 +60,7 @@ public class Main {
                 executorService.submit(() -> {
                     // for catch errors from ImageIO
                     try {
-                        processImage(file, files_formats, folder_path[0]);
+                        processImage(file, files_formats, folderPath.get());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -85,19 +94,20 @@ public class Main {
         if (!isValidImageFile(file))
             return; // if exploit is too simple, it's not interesting
         if (file.isFile()) {
+            final String HASH_SALT = "lhjb-jkh90f5";
             // split name by dot, list<String> type for get()
-            List<String> sliced_file_name = new ArrayList<>(
-                    Arrays.asList(file.getName().split("\\b.\\b"))
-            );
-            // get latest file format from name
-            String file_format = sliced_file_name.get(sliced_file_name.size() -1);
+            String fileName = file.getName();
+            int dotIndex = fileName.lastIndexOf('.');
+            if (dotIndex < 0) return;
+            // get a latest file format from name
+            String file_format = fileName.substring(dotIndex + 1).toLowerCase();
 
             // image format only
             if (files_formats.contains(file_format)) {
                 // write to memory without meta n exif
                 BufferedImage image = ImageIO.read(file);
                 // changing filename to hash with salt
-                String name_hash = MD5(file.getName() + "lhjb");
+                String name_hash = MD5(file.getName() + HASH_SALT);
                 String new_file_name = (name_hash != null) ? name_hash : file.getName();
                 // save to new file
                 ImageIO.write(image, file_format, new File(
@@ -145,7 +155,7 @@ public class Main {
             StringBuilder sb = new StringBuilder();
             // convert to normal string
             for (byte b : array) {
-                sb.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
+                sb.append(String.format("%02x", b)); // %02x for hex
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
